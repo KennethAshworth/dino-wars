@@ -1,6 +1,21 @@
 var Client = {};
 Client.socket = io.connect();
 
+Client.createBases = function(){
+	Client.socket.emit('createBases');
+};
+
+Client.socket.on('createBases', function(base){
+	Game.addBase(base);
+})
+
+Client.socket.on('addUnit', function(unit){
+	console.log(unit);
+	Game.addUnit(unit);
+});
+
+
+// OLD
 Client.askNewPlayer = function() {
 	Client.socket.emit('newplayer');
 };

@@ -1,3 +1,8 @@
-var game = new Phaser.Game(24*32, 17*32, Phaser.AUTO, document.getElementById('game'));
-game.state.add('Game',Game);
-game.state.start('Game');
+var config = {
+    type: Phaser.AUTO,
+    width: 640,
+    height: 640,
+    scene: [Game]
+};
+
+var game = new Phaser.Game(config);
