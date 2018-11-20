@@ -35,7 +35,7 @@ Game.create = function(){
 
     this.anims.create({
         key: 'idle',
-        frames: this.anims.generateFrameNumbers('dino-red', { start:0, end: 3}),
+        frames: this.anims.generateFrameNumbers('dino-red', {start:0, end: 3}),
         frameRate: 10,
         repeat: -1
     });
