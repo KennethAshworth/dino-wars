@@ -21,11 +21,21 @@ let bases = {};
 let interval;
 let base;
 
+// Need to add a function that generates this list based on an algorithm which takes a 
+// tile size of the base that is spawning and will spit out clockwise tiles offsets for 
+// potential spawn locations
+const spawnKeys = [{x:1,y:0}, {x:1,y:1}, {x:0,y:1}, 
+	{x:-1,y:1}, {x:-1,y:0}, {x:-1,y:-1}, 
+	{x:0,y:-1}, {x:1,y:-1}, {x:2,y:-1}, {x:2,y:0}, 
+	{x:2,y:1}, {x:2,y:2}, {x:1,y:2}, {x:0,y:2}, {x:-1,y:2}, {x:-2,y:2}, {x:-2,y:1},
+	{x:-2,y:0}, {x:-2,y:-1}, {x:-2,y:-2}, {x:-1,y:-2}, {x:0,y:-2}, {x:1,y:-2}, {x:2,y:-2},
+	{x:3,y:-2}, {x:3,y:-1}, {x:3,y:0}];
+
 function Base(baseConfig) {
 	this.id = baseConfig.id;
 	this.race = baseConfig.race;
 	this.position = baseConfig.position;
-	this.spawnLoc = baseConfig.spawnLoc;
+	this.spawnMap = new Map();
 	this.nextUnitId = 0;
 	this.units = {};
 	this.type = 'Base';
@@ -33,24 +43,37 @@ function Base(baseConfig) {
 
 Base.prototype.addUnit = function(){
 	const unitId = this.nextUnitId++;
+	const spawnLoc = this.getNextSpawnLoc();
 	const unit = {
 		id:unitId,
-		baseId: this.id,
+		baseId:this.id,
 		type:this.race,
-		x:this.spawnLoc.x,
-		y:this.spawnLoc.y,
+		x:spawnLoc.x,
+		y:spawnLoc.y,
+		offset: 12,
 	};
 	this.units[unitId] = unit 
-	console.log(this.units);
-	this.updateSpawnLoc();
+	//console.log(this.units);
 	return unit;
 }
 
-Base.prototype.updateSpawnLoc = function(){
-	const spawn = this.spawnLoc
-	this.spawnLoc.x = spawn.x;
-	this.spawnLoc.y = spawn.y + 1;
+Base.prototype.getNextSpawnLoc = function(){
+	let key;
+	const spawnMap = this.spawnMap;
+	for (let i = 0; i < spawnKeys.length; i++) {
+		key = spawnKeys[i];
+		if (!spawnMap.get(key)) {
+			spawnMap.set(key, true);
+			break;
+		}
+	};
+	const nextSpawnLoc = {
+		x: this.position.x + key.x, 
+		y: this.position.y + key.y
+	}; 
+	return nextSpawnLoc;
 }
+
 // determined bynumber of players in room?
 const basesConfig = [
 	{
@@ -71,7 +94,6 @@ io.on('connection', function(socket) {
 		// base.type = 'Base';
 		base = new Base(basesConfig[0]);
 		io.emit('createBases', base);
-		console.log(base);
 		interval = setInterval(function(){
 			addUnits();
 		}, 2000);

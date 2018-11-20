@@ -54,8 +54,10 @@ Game.addBase = function(base) {
 };
 
 Game.addUnit = function(unit) {
-    const tileCoord = Game.getMapCoord(unit.x, unit.y);
-    let sprite = Game.scene.add.sprite(tileCoord.x, tileCoord.y, 'dino-red');
+    const tileCoord = Game.getMapCoord(unit.x, unit.y); 
+    const spriteX = tileCoord.x + unit.offset;
+    const spriteY = tileCoord.y + unit.offset;
+    let sprite = Game.scene.add.sprite(spriteX, spriteY, 'dino-red');
     sprite.anims.play('idle', true);    
     Game.bases[unit.baseId].units[unit.id] = sprite;
 };
