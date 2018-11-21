@@ -1,5 +1,6 @@
 var Game = {
-    bases: {}
+    bases: {},
+    clickPosition: { start: {}, end: {} },
 };
 
 Game.init = function(){
@@ -23,21 +24,69 @@ Game.create = function(){
     const map = this.add.tilemap('map');
     const tileset = map.addTilesetImage('grass-tiles-2-small', 'tileset'); // tilesheet is the key of the tileset in map's JSON file
     layer = map.createStaticLayer('Tile Layer 1', tileset, 0, 0);
-    layer.inputEnabled = true; // Allows clicking on the map
-    //layer.events.onInputUp.add(Game.getCoordinates, this);
     //Client.askNewPlayer();
     Client.createBases();
-    // 0-3 idle
-    // 4-9 run
-    // 10-13 attack
-    // 14-16 die
-    // 17-22 dash
 
     this.anims.create({
         key: 'idle',
         frames: this.anims.generateFrameNumbers('dino-red', {start:0, end: 3}),
         frameRate: 10,
         repeat: -1
+    });
+
+    this.anims.create({
+        key: 'run',
+        frames: this.anims.generateFrameNumbers('dino-red', {start:4, end: 9}),
+        frameRate: 10,
+        repeat: -1
+    });
+
+    this.anims.create({
+        key: 'attack',
+        frames: this.anims.generateFrameNumbers('dino-red', {start:10, end: 13}),
+        frameRate: 10,
+        repeat: -1
+    });
+
+    this.anims.create({
+        key: 'die',
+        frames: this.anims.generateFrameNumbers('dino-red', {start:14, end: 16}),
+        frameRate: 10,
+        repeat: -1
+    });
+
+    this.anims.create({
+        key: 'dash',
+        frames: this.anims.generateFrameNumbers('dino-red', {start:17, end: 22}),
+        frameRate: 10,
+        repeat: -1
+    });
+
+    // selection setup
+    var graphics = this.add.graphics();
+    var color = 0xffff00;
+    var thickness = 2;
+    var alpha = 1;
+
+    var draw = false;
+    this.input.on('pointerdown', function (pointer) {
+        draw = true;
+    });
+
+    this.input.on('pointerup', function (pointer) {
+        draw = false;
+        graphics.clear();
+        if (pointer.downX != pointer.x && pointer.downY != pointer.y)
+            Game.getUnitsInSelection(pointer);
+    });
+
+    this.input.on('pointermove', function (pointer) {
+        if (draw)
+        {
+            graphics.clear();
+            graphics.lineStyle(thickness, color, alpha);
+            graphics.strokeRect(pointer.downX, pointer.downY, pointer.x - pointer.downX, pointer.y - pointer.downY);
+        }
     });
 };
 
@@ -54,12 +103,49 @@ Game.addBase = function(base) {
 };
 
 Game.addUnit = function(unit) {
-    const tileCoord = Game.getMapCoord(unit.x, unit.y); 
-    const spriteX = tileCoord.x + unit.offset;
-    const spriteY = tileCoord.y + unit.offset;
-    let sprite = Game.scene.add.sprite(spriteX, spriteY, 'dino-red');
-    sprite.anims.play('idle', true);    
-    Game.bases[unit.baseId].units[unit.id] = sprite;
+    const spriteCoord = Game.getSpriteCoord(unit.x, unit.y, unit.offset) 
+    Game.createRedDino(spriteCoord, unit);
+};
+
+Game.createRedDino = function(coord, unit) {
+    let sprite = Game.scene.add.sprite(coord.x, coord.y, 'dino-red');
+    sprite.anims.play('idle', true);
+    unit.sprite = sprite;
+    Game.addUnitToBase(unit); 
+};
+
+Game.getUnitsInSelection = function(pointer) {
+    // selected off the base of the socketId, use 1 for now
+    let units = Game.bases[1].units;
+    for(var i = 0; i < Object.keys(units).length; i++) {
+        Game.isUnitInSelection(units[i], pointer);
+    }
+};
+
+Game.isUnitInSelection = function(unit, p) {
+    var largeX, smallX, largeY, largeX;
+    largeX = p.x > p.downX ? p.x : p.downX
+    smallX = p.x < p.downX ? p.x : p.downX
+    largeY = p.y > p.downY ? p.y : p.downY
+    smallY = p.y < p.downY ? p.y : p.downY
+    const spriteCoord = Game.getSpriteCoord(unit.x, unit.y, unit.offset) 
+
+    if (spriteCoord.x > smallX && spriteCoord.x < largeX && 
+            spriteCoord.y > smallY && spriteCoord.y < largeY) {
+        unit.sprite.alpha = 0.5;
+    }
+    //Game.addUnitToBase(unit);
+};
+
+Game.addUnitToBase = function(unit) {
+    Game.bases[unit.baseId].units[unit.id] = unit
+};
+
+Game.getSpriteCoord = function(x, y, offset) {
+    const tileCoord = Game.getMapCoord(x, y) 
+    const spriteX = tileCoord.x + offset;
+    const spriteY = tileCoord.y + offset;   
+    return { x: spriteX, y: spriteY };
 };
 
 Game.getMapCoord = function(x, y) {
@@ -69,7 +155,7 @@ Game.getMapCoord = function(x, y) {
 }
 
 
-// OLD
+// ************* OLD **************************
 Game.addNewPlayer = function(id, x, y) {
     Game.playerMap[id] = game.add.sprite(x, y, 'sprite');
 };

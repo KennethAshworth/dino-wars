@@ -10,7 +10,6 @@ Client.socket.on('createBases', function(base){
 })
 
 Client.socket.on('addUnit', function(unit){
-	console.log(unit);
 	Game.addUnit(unit);
 });
 
@@ -25,12 +24,11 @@ Client.sendClick = function(x, y) {
 }
 
 Client.socket.on('newplayer', function(data){
-	console.log(data);
 	Game.addNewPlayer(data.id, data.x, data.y);
 });
 
 Client.socket.on('allplayers', function(data){
-	for(var i= 0; i < data.length; i++) {
+	for(var i = 0; i < data.length; i++) {
 		Game.addNewPlayer(data[i].id, data[i].x, data[i].y);
 	}
 });
