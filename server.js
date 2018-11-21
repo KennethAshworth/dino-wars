@@ -96,7 +96,7 @@ io.on('connection', function(socket) {
 		io.emit('createBases', base);
 		interval = setInterval(function(){
 			addUnits();
-		}, 2000);
+		}, 500);
 
 		//socket.player = {
 		//	id: server.lastPlayerID++,

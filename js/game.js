@@ -103,11 +103,15 @@ Game.addBase = function(base) {
 };
 
 Game.addUnit = function(unit) {
-    const spriteCoord = Game.getSpriteCoord(unit.x, unit.y, unit.offset) 
+    const spriteCoord = Game.getSpriteCoord(unit.x, unit.y, unit.offset);
+    // todo: i think I need to add a collider generator for the new sprite phsyics body
+    //      to compare against all other units in the game (currently ony this base)
     Game.createRedDino(spriteCoord, unit);
 };
 
 Game.createRedDino = function(coord, unit) {
+    // todo: need to generate this sprite from the physics dynamic factory instead
+    //      so that I can use the phsyics body for movement and colliding
     let sprite = Game.scene.add.sprite(coord.x, coord.y, 'dino-red');
     sprite.anims.play('idle', true);
     unit.sprite = sprite;
@@ -116,6 +120,9 @@ Game.createRedDino = function(coord, unit) {
 
 Game.getUnitsInSelection = function(pointer) {
     // selected off the base of the socketId, use 1 for now
+
+    // todo: need to save the current selection set in Game and
+    //      clean it out on the pointermove event when draw is true
     let units = Game.bases[1].units;
     for(var i = 0; i < Object.keys(units).length; i++) {
         Game.isUnitInSelection(units[i], pointer);
