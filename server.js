@@ -20,7 +20,7 @@ server.listen(process.env.PORT || 8081,function(){
 let bases = {};
 let interval;
 let base;
-let spawnRate = 1000;
+let spawnRate = 10;
 const mapTileSize = 36;
 const unitTileSize = 24;
 const movementTileSize = 4;
@@ -187,7 +187,7 @@ function getMapCoord(x, y) {
 const basesConfig = [
 	{
 		id:1,
-		race:'red',
+		race:'red-dino',
 		position:{x:2,y:2}, 
 	}
 ];

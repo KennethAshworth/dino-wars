@@ -6,7 +6,7 @@ Client.createBases = function(){
 };
 
 Client.updateUnits = function(units){
-	const trimmedUnits = Client.createUnitModels(units);
+	const trimmedUnits = Client.trimUnitModels(units);
 	Client.socket.emit('updateUnits', trimmedUnits);
 };
 
@@ -18,7 +18,7 @@ Client.socket.on('addUnit', function(unit){
 	Game.addUnit(unit);
 });
 
-Client.createUnitModels = function(units) {
+Client.trimUnitModels = function(units) {
 	let trimmedUnits = {};
 	Object.keys(units).forEach(function(id) {
 		const unit = units[id];
